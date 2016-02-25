@@ -9,12 +9,9 @@
 import Foundation
 import UIKit
 
-public class MaterialLoader: UIView, UIScrollViewDelegate {
+public class MaterialLoader: UIView {
     private let loaderLayer = CAShapeLayer()
     private let containerView = UIView()
-    private var scrollView:UIScrollView?
-    private var animating: Bool = false
-    public var delegate: MaterialLoaderDelegate?
     
     override private init(frame: CGRect) {
         super.init(frame: frame)
@@ -73,49 +70,7 @@ public class MaterialLoader: UIView, UIScrollViewDelegate {
         loaderLayer.addAnimation(strokeStart, forKey: "strokeStart")
     }
     
-    // MARK: Scroll View Delegate
-    public func scrollViewDidScroll(scrollView: UIScrollView) {
-        let percent = (scrollView.contentOffset.y / -120)
-        
-        if !animating {
-            self.transform = CGAffineTransformMakeRotation(CGFloat(-M_PI_2))
-            loaderLayer.strokeEnd = percent
-        }
-    }
-    
-    public func scrollViewDidEndDragging(scrollView: UIScrollView, willDecelerate decelerate: Bool) {
-        
-        if (scrollView.contentOffset.y / -120) > 1 && !animating {
-            
-            self.delegate?.handleRefresh(self)
-            
-            animating = true
-            self.startAnimation()
-            UIView.animateWithDuration(0.5, delay: 0, usingSpringWithDamping: 0.5, initialSpringVelocity: 0, options: [], animations: { () -> Void in
-                self.center = CGPointMake(self.superview!.frame.size.width / 2, 70)
-                }, completion: {(bla) -> () in
-                    
-            })
-        }
-    }
-    
     // MARK: Public
-    
-    public convenience init(scrollView: UIScrollView, delegate: MaterialLoaderDelegate) {
-        
-        self.init(frame: scrollView.frame)
-        
-        self.delegate = delegate
-        
-        self.center = CGPointMake(scrollView.frame.size.width / 2, -50)
-        self.loaderLayer.strokeColor = UIColor.redColor().CGColor
-        
-        self.scrollView = scrollView
-        self.scrollView?.delegate = self
-        self.scrollView?.addSubview(self)
-        self.scrollView?.bringSubviewToFront(self)
-        
-    }
     
     public class func showInView(view: UIView, loaderColor: UIColor = .redColor()) -> MaterialLoader {
         let loader = MaterialLoader(frame: view.bounds)
@@ -130,16 +85,7 @@ public class MaterialLoader: UIView, UIScrollViewDelegate {
     }
     
     public func dismiss() {
-        UIView.animateWithDuration(0.5, animations: { () -> Void in
-            self.center = CGPointMake(self.superview!.frame.size.width / 2, -100)
-            }) { (bla) -> Void in
-                self.removeFromSuperview()
-                self.animating = false
-        }
+        removeFromSuperview()
     }
-}
-
-public protocol MaterialLoaderDelegate {
-    func handleRefresh(loader: MaterialLoader)
 }
 

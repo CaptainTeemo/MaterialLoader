@@ -35,7 +35,7 @@ class ViewController: UIViewController {
     }
     
     @IBAction func showHud(sender: UIButton) {
-        let loader = MaterialLoader.showInView(view)
+        let loader = MaterialLoader.showInView(view, loaderColor: UIColor.greenColor())
         dispatchAfter(3, action: { () -> Void in
             loader.dismiss()
         })

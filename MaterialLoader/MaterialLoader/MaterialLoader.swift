@@ -75,14 +75,13 @@ public class MaterialLoader: UIView {
     
     // MARK: Public
     
-    public class func showInView(view: UIView, loaderColor: UIColor = .redColor()) -> MaterialLoader {
+    public class func showInView(view: UIView, loaderColor: UIColor!) -> MaterialLoader {
         let loader = MaterialLoader(frame: view.bounds)
         loader.backgroundColor = UIColor(white: 0, alpha: 0.5)
         loader.center = view.center
         loader.loaderLayer.strokeColor = loaderColor.CGColor
         view.addSubview(loader)
         view.bringSubviewToFront(loader)
-        
         loader.startAnimation()
         
         return loader

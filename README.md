@@ -1,6 +1,6 @@
 # MaterialLoader
 
-As an Apple fan, Google's design guidelines for Android called [Material Design](https://www.google.com/design/spec/material-design) really impressed me a lot, and I found myself falling in love with it!
+As an Apple fan, Google's design guidelines called [Material Design](https://www.google.com/design/spec/material-design) really impressed me a lot, and I found myself falling in love with it!
 
 Although there is an awesome repo implemented lots of Material style views ([MaterialKit](https://github.com/nghialv/MaterialKit) by @nghialv), I'm here to make my own.
 

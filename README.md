@@ -1,4 +1,6 @@
 # MaterialLoader
+[![Carthage compatible](https://img.shields.io/badge/Carthage-compatible-4BC51D.svg?style=flat)](https://github.com/Carthage/Carthage)
+[![Build Status](https://travis-ci.org/CaptainTeemo/MaterialLoader.svg?branch=master)](https://travis-ci.org/CaptainTeemo/MaterialLoader)
 
 As an Apple fan, Google's design guidelines called [Material Design](https://www.google.com/design/spec/material-design) really impressed me a lot, and I found myself falling in love with it!
 
@@ -36,3 +38,12 @@ MaterialLoader.addRefreshHeader(scrollView) { () -> Void in
     }
 }
 ```
+
+## Requirements
+* iOS 8.0+
+* Xcode 7.2+
+
+## Carthage
+Put `github "CaptainTeemo/MaterialLoader"` in your cartfile and run `carthage update` from terminal, then drag built framework to you project.
+
+Hope you like it.

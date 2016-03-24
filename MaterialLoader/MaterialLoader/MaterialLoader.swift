@@ -15,7 +15,6 @@ private let scrollViewLoadingHeight: CGFloat = 100
 
 public class MaterialLoader: UIView {
     private let loaderLayer = CAShapeLayer()
-    private let containerView = UIView()
     
     private var lineWidth: CGFloat {
         return radius / 10
@@ -34,12 +33,35 @@ public class MaterialLoader: UIView {
     }
     
     private func commonInit() {
+        
+        let shadowLayer = CALayer()
+        shadowLayer.frame = CGRect(
+            x: frame.width / 2 - radius * containerRatio / 2,
+            y: frame.height / 2 - radius * containerRatio / 2,
+            width: radius * containerRatio,
+            height: radius * containerRatio
+        )
+        
+        shadowLayer.shadowOffset = CGSize(width: 0, height: 5)
+        shadowLayer.shadowRadius = 3
+        shadowLayer.shadowColor = UIColor(white: 0, alpha: 0.4).CGColor
+        shadowLayer.shadowOpacity = 1
+        layer.addSublayer(shadowLayer)
+        
+        let containerView = UIView()
         containerView.backgroundColor = .whiteColor()
-        containerView.frame = CGRect(x: 0, y: 0, width: radius * containerRatio, height: radius * containerRatio)
+        containerView.frame = CGRect(
+            x: 0,
+            y: 0,
+            width: radius * containerRatio,
+            height: radius * containerRatio
+        )
         containerView.center = center
         addSubview(containerView)
         
         let maskPath = UIBezierPath(ovalInRect: containerView.bounds)
+        shadowLayer.shadowPath = maskPath.CGPath
+
         let containerMask = CAShapeLayer()
         containerMask.path = maskPath.CGPath
         containerView.layer.mask = containerMask
@@ -47,7 +69,12 @@ public class MaterialLoader: UIView {
         loaderLayer.fillColor = nil
         loaderLayer.strokeColor = UIColor.redColor().CGColor
         loaderLayer.lineWidth = lineWidth
-        loaderLayer.frame = CGRect(x: containerView.frame.width / 2 - radius / 2, y: containerView.frame.height / 2 - radius / 2, width: radius, height: radius)
+        loaderLayer.frame = CGRect(
+            x: containerView.frame.width / 2 - radius / 2,
+            y: containerView.frame.height / 2 - radius / 2,
+            width: radius,
+            height: radius
+        )
         containerView.layer.addSublayer(loaderLayer)
         
         let path = UIBezierPath(ovalInRect: loaderLayer.bounds)
@@ -77,7 +104,7 @@ public class MaterialLoader: UIView {
     
     public class func showInView(view: UIView, loaderColor: UIColor = .redColor()) -> MaterialLoader {
         let loader = MaterialLoader(frame: view.bounds)
-        loader.backgroundColor = UIColor(white: 0, alpha: 0.5)
+        loader.backgroundColor = UIColor(white: 0, alpha: 0)
         loader.center = view.center
         loader.loaderLayer.strokeColor = loaderColor.CGColor
         view.addSubview(loader)
@@ -89,7 +116,7 @@ public class MaterialLoader: UIView {
     }
     
     public class func addRefreshHeader(scrollView: UIScrollView, loaderColor: UIColor = .redColor(), action: () -> Void) {
-        let loader = MaterialLoader(frame: CGRect(x: 0, y: 0, width: radius * containerRatio, height: radius * containerRatio))
+        let loader = MaterialLoader(frame: CGRect(x: 0, y: 0, width: radius * containerRatio + 20, height: radius * containerRatio + 20))
         loader.loaderLayer.strokeColor = loaderColor.CGColor
         loader.center.x = UIScreen.mainScreen().bounds.size.width / 2
         let pullToRefresh = PullToRefresh(refreshView: loader, animator: loader)

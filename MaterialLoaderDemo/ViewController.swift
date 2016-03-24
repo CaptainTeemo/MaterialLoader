@@ -9,7 +9,7 @@
 import UIKit
 import MaterialLoader
 
-func dispatchAfter(seconds: Double, action: () -> Void) {
+func after(seconds: Double, action: () -> Void) {
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, Int64(NSEC_PER_SEC) * Int64(seconds)), dispatch_get_main_queue(), action)
 }
 
@@ -23,7 +23,7 @@ class ViewController: UIViewController {
         // Do any additional setup after loading the view, typically from a nib.
         
         MaterialLoader.addRefreshHeader(scrollView) { () -> Void in
-            dispatchAfter(3, action: { () -> Void in
+            after(5, action: { () -> Void in
                 self.scrollView.endRefreshing()
             })
         }
@@ -36,7 +36,7 @@ class ViewController: UIViewController {
     
     @IBAction func showHud(sender: UIButton) {
         let loader = MaterialLoader.showInView(view)
-        dispatchAfter(3, action: { () -> Void in
+        after(5, action: { () -> Void in
             loader.dismiss()
         })
     }

@@ -9,15 +9,22 @@
 import UIKit
 import MaterialLoader
 
-class ViewController: UIViewController {
+func after(seconds: Double, action: () -> Void) {
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, Int64(NSEC_PER_SEC) * Int64(seconds)), dispatch_get_main_queue(), action)
+}
 
+class ViewController: UIViewController {
+    
+    @IBOutlet weak var scrollView: UIScrollView!
+    @IBOutlet weak var button: UIButton!
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
-        
-        let loader = MaterialLoader.showInView(view)
-        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, Int64(NSEC_PER_SEC * 5)), dispatch_get_main_queue()) { () -> Void in
-//            loader.dismiss()
+        MaterialLoader.addRefreshHeader(scrollView) { () -> Void in
+            after(5, action: { () -> Void in
+                self.scrollView.endRefreshing()
+            })
         }
     }
 
@@ -25,7 +32,13 @@ class ViewController: UIViewController {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
     }
-
+    
+    @IBAction func showHud(sender: UIButton) {
+        let loader = MaterialLoader.showInView(view)
+        after(5, action: { () -> Void in
+            loader.dismiss()
+        })
+    }
 
 }
 

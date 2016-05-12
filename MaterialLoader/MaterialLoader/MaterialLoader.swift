@@ -62,9 +62,9 @@ public class MaterialLoader: UIView {
         
         let strokeStart = CABasicAnimation(keyPath: "strokeStart")
         strokeStart.repeatCount = Float.infinity
-        strokeStart.duration = 0.8
+        strokeStart.duration = 1.2
         strokeStart.timingFunction = CAMediaTimingFunction(name: kCAMediaTimingFunctionEaseInEaseOut)
-        strokeStart.fromValue = 0.4
+        strokeStart.fromValue = 0.2
         strokeStart.toValue = 0.9
         strokeStart.autoreverses = true
         loaderLayer.addAnimation(strokeStart, forKey: "strokeStart")

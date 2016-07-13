@@ -15,6 +15,7 @@ private let scrollViewLoadingHeight: CGFloat = 100
 
 public class MaterialLoader: UIView {
     private let loaderLayer = CAShapeLayer()
+    private let containerView = UIView()
     
     private var lineWidth: CGFloat {
         return radius / 10
@@ -48,7 +49,6 @@ public class MaterialLoader: UIView {
         shadowLayer.shadowOpacity = 1
         layer.addSublayer(shadowLayer)
         
-        let containerView = UIView()
         containerView.backgroundColor = .whiteColor()
         containerView.frame = CGRect(
             x: 0,
@@ -83,21 +83,35 @@ public class MaterialLoader: UIView {
     }
     
     private func startAnimation() {
+        let loopDuration: Double = 1.1
+        
         let rotation = CABasicAnimation(keyPath: "transform.rotation")
         rotation.fromValue = 0
         rotation.toValue = 2 * M_PI
-        rotation.duration = 0.8
-        rotation.repeatCount = .infinity
-        loaderLayer.addAnimation(rotation, forKey: "rotation")
+        rotation.duration = loopDuration
         
-        let strokeStart = CABasicAnimation(keyPath: "strokeStart")
-        strokeStart.repeatCount = Float.infinity
-        strokeStart.duration = 1.2
-        strokeStart.timingFunction = CAMediaTimingFunction(name: kCAMediaTimingFunctionEaseInEaseOut)
-        strokeStart.fromValue = 0.2
-        strokeStart.toValue = 0.9
-        strokeStart.autoreverses = true
-        loaderLayer.addAnimation(strokeStart, forKey: "strokeStart")
+        let start = CABasicAnimation(keyPath: "strokeStart")
+        start.duration = loopDuration
+        start.timingFunction = CAMediaTimingFunction(name: kCAMediaTimingFunctionEaseInEaseOut)
+        start.fromValue = 0
+        start.toValue = 1
+        start.autoreverses = false
+        start.fillMode = kCAFillModeBackwards
+        
+        let end = CABasicAnimation(keyPath: "strokeEnd")
+        end.duration = 0.4
+        end.timingFunction = CAMediaTimingFunction(name: kCAMediaTimingFunctionEaseInEaseOut)
+        end.fromValue = 0
+        end.toValue = 1
+        end.autoreverses = false
+        end.fillMode = kCAFillModeBackwards
+        loaderLayer.addAnimation(start, forKey: "end")
+        
+        let group = CAAnimationGroup()
+        group.animations = [start, end, rotation]
+        group.repeatCount = .infinity
+        group.duration = loopDuration
+        loaderLayer.addAnimation(group, forKey: "group")
     }
     
     // MARK: Public
@@ -142,7 +156,7 @@ extension MaterialLoader: RefreshViewAnimator {
 }
 
 
-// This PullToRefresh stuff is copied from https://github.com/Yalantis/PullToRefresh
+// This PullToRefresh stuff is stolen from https://github.com/Yalantis/PullToRefresh
 
 // MARK: Pull to refresh stuff
 

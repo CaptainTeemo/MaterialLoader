@@ -9,16 +9,56 @@
 import Foundation
 import UIKit
 
-private let radius: CGFloat = 25
+private let diameter: CGFloat = 25
 private let containerRatio: CGFloat = 2
 private let scrollViewLoadingHeight: CGFloat = 100
 
-public class MaterialLoader: UIView {
+private let animationDuration: Double = 0.75
+private let maxStroke: CGFloat = 0.75
+private let minStroke: CGFloat = 0.05
+
+private let numberOfArcs: CGFloat = 20
+
+public final class MaterialLoader: UIView {
     private let loaderLayer = CAShapeLayer()
     private let containerView = UIView()
     
+    private let timingFunction = CAMediaTimingFunction(name: kCAMediaTimingFunctionEaseInEaseOut)
+    
+    private lazy var indeterminateAnimationGroup: CAAnimationGroup = {
+        var animations = [CAAnimation]()
+        var startValue: CGFloat = 0
+        var startTime: Double = 0
+        
+        let valueScale = 1.0 / numberOfArcs
+        
+        repeat {
+            animations += self.indeterminateAnimation(startValue, startTime: startTime, valueScale: valueScale)
+            
+            let delta = valueScale * (maxStroke + minStroke)
+            startValue += (delta)
+            startTime += animationDuration * 2
+        } while fmod(floor(startValue * 1000), 1000) > 0
+        
+        let group = CAAnimationGroup()
+        group.animations = animations
+        group.duration = startTime
+        group.repeatCount = .infinity
+        group.removedOnCompletion = false
+        group.fillMode = kCAFillModeForwards
+        
+        return group
+    }()
+    
     private var lineWidth: CGFloat {
-        return radius / 10
+        return diameter / 10
+    }
+    
+    private var progress: CGFloat = 0 {
+        didSet {
+            loaderLayer.strokeEnd = 1 / numberOfArcs * progress
+            loaderLayer.transform = CATransform3DMakeRotation(progress * 3 * CGFloat(M_PI_2), 0, 0, 1)
+        }
     }
     
     override private init(frame: CGRect) {
@@ -37,13 +77,13 @@ public class MaterialLoader: UIView {
         
         let shadowLayer = CALayer()
         shadowLayer.frame = CGRect(
-            x: frame.width / 2 - radius * containerRatio / 2,
-            y: frame.height / 2 - radius * containerRatio / 2,
-            width: radius * containerRatio,
-            height: radius * containerRatio
+            x: frame.width / 2 - diameter * containerRatio / 2,
+            y: frame.height / 2 - diameter * containerRatio / 2,
+            width: diameter * containerRatio,
+            height: diameter * containerRatio
         )
         
-        shadowLayer.shadowOffset = CGSize(width: 0, height: 5)
+        shadowLayer.shadowOffset = CGSize(width: 0, height: 2.5)
         shadowLayer.shadowRadius = 3
         shadowLayer.shadowColor = UIColor(white: 0, alpha: 0.4).CGColor
         shadowLayer.shadowOpacity = 1
@@ -53,8 +93,8 @@ public class MaterialLoader: UIView {
         containerView.frame = CGRect(
             x: 0,
             y: 0,
-            width: radius * containerRatio,
-            height: radius * containerRatio
+            width: diameter * containerRatio,
+            height: diameter * containerRatio
         )
         containerView.center = center
         addSubview(containerView)
@@ -70,48 +110,94 @@ public class MaterialLoader: UIView {
         loaderLayer.strokeColor = UIColor.redColor().CGColor
         loaderLayer.lineWidth = lineWidth
         loaderLayer.frame = CGRect(
-            x: containerView.frame.width / 2 - radius / 2,
-            y: containerView.frame.height / 2 - radius / 2,
-            width: radius,
-            height: radius
+            x: containerView.frame.width / 2 - diameter / 2,
+            y: containerView.frame.height / 2 - diameter / 2,
+            width: diameter,
+            height: diameter
         )
+        
         containerView.layer.addSublayer(loaderLayer)
         
-        let path = UIBezierPath(ovalInRect: loaderLayer.bounds)
+        let startAngle: CGFloat = 0
+        let endAngle = CGFloat(numberOfArcs) * 6 + 1.5 * CGFloat(M_PI)
+        
+        let path = UIBezierPath(arcCenter: CGPoint(x: loaderLayer.bounds.midX, y: loaderLayer.bounds.midY), radius: diameter / 2, startAngle: startAngle, endAngle: endAngle, clockwise: true)
+        
         loaderLayer.path = path.CGPath
-        loaderLayer.strokeEnd = 1
+        loaderLayer.strokeStart = 0
+        loaderLayer.strokeEnd = 0.5
     }
     
     private func startAnimation() {
-        let loopDuration: Double = 1.1
+        
+        let loopDuration: Double = 2
         
         let rotation = CABasicAnimation(keyPath: "transform.rotation")
         rotation.fromValue = 0
         rotation.toValue = 2 * M_PI
         rotation.duration = loopDuration
+        rotation.removedOnCompletion = false
+        rotation.fillMode = kCAFillModeForwards
+        rotation.repeatCount = .infinity
+        containerView.layer.addAnimation(rotation, forKey: "rotation")
         
-        let start = CABasicAnimation(keyPath: "strokeStart")
-        start.duration = loopDuration
-        start.timingFunction = CAMediaTimingFunction(name: kCAMediaTimingFunctionEaseInEaseOut)
-        start.fromValue = 0
-        start.toValue = 1
-        start.autoreverses = false
-        start.fillMode = kCAFillModeBackwards
+//        let start = CABasicAnimation(keyPath: "strokeStart")
+//        start.duration = 0.4
+//        start.timingFunction = CAMediaTimingFunction(name: kCAMediaTimingFunctionEaseInEaseOut)
+//        start.fromValue = 0.1
+//        start.toValue = 0.9
+//        start.beginTime = 0.4
+//        start.fillMode = kCAFillModeForwards
+//        
+//        let end = CABasicAnimation(keyPath: "strokeEnd")
+//        end.duration = 0.4
+//        end.timingFunction = CAMediaTimingFunction(name: kCAMediaTimingFunctionEaseInEaseOut)
+//        end.fromValue = 0
+//        end.toValue = 1
+//        end.beginTime = 0
+//        end.fillMode = kCAFillModeForwards
         
-        let end = CABasicAnimation(keyPath: "strokeEnd")
-        end.duration = 0.4
-        end.timingFunction = CAMediaTimingFunction(name: kCAMediaTimingFunctionEaseInEaseOut)
-        end.fromValue = 0
-        end.toValue = 1
-        end.autoreverses = false
-        end.fillMode = kCAFillModeBackwards
-        loaderLayer.addAnimation(start, forKey: "end")
+//        let group = CAAnimationGroup()
+//        group.animations = [start, end, rotation]
+//        group.repeatCount = .infinity
+//        group.duration = loopDuration
+//        group.removedOnCompletion = false
+//        group.fillMode = kCAFillModeForwards
+//        loaderLayer.addAnimation(group, forKey: "group")
         
-        let group = CAAnimationGroup()
-        group.animations = [start, end, rotation]
-        group.repeatCount = .infinity
-        group.duration = loopDuration
-        loaderLayer.addAnimation(group, forKey: "group")
+        loaderLayer.addAnimation(indeterminateAnimationGroup, forKey: "group")
+    }
+    
+    private func indeterminateAnimation(startValue: CGFloat, startTime: Double, valueScale: CGFloat) -> [CAAnimation] {
+        let startHead = CABasicAnimation(keyPath: "strokeEnd")
+        startHead.duration = animationDuration
+        startHead.beginTime = startTime
+        startHead.fromValue = startValue
+        startHead.toValue = startValue + valueScale * (maxStroke + minStroke)
+        startHead.timingFunction = timingFunction
+        
+        let startTail = CABasicAnimation(keyPath: "strokeStart")
+        startTail.duration = animationDuration
+        startTail.beginTime = startTime
+        startTail.fromValue = startValue - valueScale * minStroke
+        startTail.toValue = startValue
+        startTail.timingFunction = timingFunction
+        
+        let endHead = CABasicAnimation(keyPath: "strokeEnd")
+        endHead.duration = animationDuration
+        endHead.beginTime = startTime + animationDuration
+        endHead.fromValue = startValue + valueScale * (maxStroke + minStroke)
+        endHead.toValue = startValue + valueScale * (maxStroke + minStroke)
+        endHead.timingFunction = timingFunction
+        
+        let endTail = CABasicAnimation(keyPath: "strokeStart")
+        endTail.duration = animationDuration
+        endTail.beginTime = startTime + animationDuration
+        endTail.fromValue = startValue
+        endTail.toValue = startValue + valueScale * maxStroke
+        endTail.timingFunction = timingFunction
+        
+        return [startHead, startTail, endHead, endTail]
     }
     
     // MARK: Public
@@ -130,7 +216,7 @@ public class MaterialLoader: UIView {
     }
     
     public class func addRefreshHeader(scrollView: UIScrollView, loaderColor: UIColor = .redColor(), action: () -> Void) {
-        let loader = MaterialLoader(frame: CGRect(x: 0, y: 0, width: radius * containerRatio + 20, height: radius * containerRatio + 20))
+        let loader = MaterialLoader(frame: CGRect(x: 0, y: 0, width: diameter * containerRatio + 20, height: diameter * containerRatio + 20))
         loader.loaderLayer.strokeColor = loaderColor.CGColor
         loader.center.x = UIScreen.mainScreen().bounds.size.width / 2
         let pullToRefresh = PullToRefresh(refreshView: loader, animator: loader)
@@ -150,7 +236,7 @@ extension MaterialLoader: RefreshViewAnimator {
         case .Loading:
             startAnimation()
         case .Releasing(let progress):
-            loaderLayer.strokeEnd = progress
+            self.progress = progress
         }
     }
 }
@@ -164,7 +250,7 @@ protocol RefreshViewAnimator {
     func animateState(state: State)
 }
 
-class PullToRefresh: NSObject {
+public final class PullToRefresh: NSObject {
     
     var hideDelay: NSTimeInterval = 0
     
@@ -235,7 +321,7 @@ class PullToRefresh: NSObject {
     
     init(refreshView: UIView, animator: RefreshViewAnimator) {
         self.refreshView = refreshView
-        self.animator = animator
+        self.animator = animator        
     }
     
     deinit {
@@ -248,7 +334,7 @@ class PullToRefresh: NSObject {
     private let contentOffsetKeyPath = "contentOffset"
     private var previousScrollViewOffset: CGPoint = CGPointZero
     
-    override  func observeValueForKeyPath(keyPath: String?, ofObject object: AnyObject?, change: [String : AnyObject]?, context: UnsafeMutablePointer<()>) {
+    override  public func observeValueForKeyPath(keyPath: String?, ofObject object: AnyObject?, change: [String : AnyObject]?, context: UnsafeMutablePointer<()>) {
         if (context == &KVOContext && keyPath == contentOffsetKeyPath && object as? UIScrollView == scrollView) {
             let offset = previousScrollViewOffset.y + scrollViewDefaultInsets.top
             let refreshViewHeight = refreshView.frame.height
@@ -334,9 +420,9 @@ extension UIScrollView {
         }
     }
     
-    func addPullToRefresh(pullToRefresh: PullToRefresh, action:()->()) {
-        if self.pullToRefresh != nil {
-            self.removePullToRefresh(self.pullToRefresh!)
+    public func addPullToRefresh(pullToRefresh: PullToRefresh, action:()->()) {
+        if let pull = self.pullToRefresh {
+            removePullToRefresh(pull)
         }
         
         self.pullToRefresh = pullToRefresh
@@ -344,13 +430,12 @@ extension UIScrollView {
         pullToRefresh.action = action
         
         let view = pullToRefresh.refreshView
-        //        view.frame = CGRectMake(0, -view.frame.size.height, self.frame.size.width, view.frame.size.height)
         view.frame.origin.y = -view.frame.height
         self.addSubview(view)
         self.sendSubviewToBack(view)
     }
     
-    func removePullToRefresh(pullToRefresh: PullToRefresh) {
+    public func removePullToRefresh(pullToRefresh: PullToRefresh) {
         self.pullToRefresh?.refreshView.removeFromSuperview()
         self.pullToRefresh = nil
     }

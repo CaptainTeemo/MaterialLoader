@@ -141,30 +141,6 @@ public final class MaterialLoader: UIView {
         rotation.repeatCount = .infinity
         containerView.layer.addAnimation(rotation, forKey: "rotation")
         
-//        let start = CABasicAnimation(keyPath: "strokeStart")
-//        start.duration = 0.4
-//        start.timingFunction = CAMediaTimingFunction(name: kCAMediaTimingFunctionEaseInEaseOut)
-//        start.fromValue = 0.1
-//        start.toValue = 0.9
-//        start.beginTime = 0.4
-//        start.fillMode = kCAFillModeForwards
-//        
-//        let end = CABasicAnimation(keyPath: "strokeEnd")
-//        end.duration = 0.4
-//        end.timingFunction = CAMediaTimingFunction(name: kCAMediaTimingFunctionEaseInEaseOut)
-//        end.fromValue = 0
-//        end.toValue = 1
-//        end.beginTime = 0
-//        end.fillMode = kCAFillModeForwards
-        
-//        let group = CAAnimationGroup()
-//        group.animations = [start, end, rotation]
-//        group.repeatCount = .infinity
-//        group.duration = loopDuration
-//        group.removedOnCompletion = false
-//        group.fillMode = kCAFillModeForwards
-//        loaderLayer.addAnimation(group, forKey: "group")
-        
         loaderLayer.addAnimation(indeterminateAnimationGroup, forKey: "group")
     }
     

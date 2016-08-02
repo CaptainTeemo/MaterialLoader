@@ -9,7 +9,7 @@ Although there is an awesome framework implemented lots of Material components (
 
 ~~Well, the animation is a little bit crappy, but it's not that bad right? :p~~
 
-Finally I've got a better animation.
+**Finally I've got a better animation.**
 
 Here's how it looks like:
 

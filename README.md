@@ -19,22 +19,27 @@ Here's how it looks like:
 
 ### Simple to use
 
+```swift
+func after(_ seconds: Double, action: @escaping () -> Void) {
+    DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + Double(Int64(NSEC_PER_SEC) * Int64(seconds)) / Double(NSEC_PER_SEC), execute: action)
+}
+```
+
 use as HUD
 ```swift
 let loader = MaterialLoader.showInView(view)
-// dismiss after 5 seconds
-dispatch_after(dispatch_time(DISPATCH_TIME_NOW, Int64(NSEC_PER_SEC * 5)), dispatch_get_main_queue()) { () -> Void in
+after(5, action: { () -> Void in
     loader.dismiss()
-}
+})
 ```
 
 or pull to refresh
 
 ```swift
 MaterialLoader.addRefreshHeader(scrollView) { () -> Void in
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, Int64(NSEC_PER_SEC * 5)), dispatch_get_main_queue()) { () -> Void in
+    after(5, action: { () -> Void in
         self.scrollView.endRefreshing()
-    }
+    })
 }
 ```
 

@@ -4,13 +4,12 @@
 
 As an Apple fan, Google's design guidelines called [Material Design](https://www.google.com/design/spec/material-design) really impressed me a lot, and I found myself falling in love with it!
 
-Although there is an awesome repo implemented lots of Material style views ([MaterialKit](https://github.com/nghialv/MaterialKit) by @nghialv), I'm here to make my own.
-
-(Oh I found a [better framework](https://github.com/CosmicMind/Material.git))
+Although there is an awesome framework implemented lots of Material components ([Material](https://github.com/CosmicMind/Material.git) by @CosmicMind), I'm here to make my own.
 
 
-Well, the animation is a little bit crappy, but it's not that bad right? :p
+~~Well, the animation is a little bit crappy, but it's not that bad right? :p~~
 
+**Finally I've got a better animation.**
 
 Here's how it looks like:
 

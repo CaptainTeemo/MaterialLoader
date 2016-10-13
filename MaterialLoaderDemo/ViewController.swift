@@ -9,8 +9,8 @@
 import UIKit
 import MaterialLoader
 
-func after(seconds: Double, action: () -> Void) {
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, Int64(NSEC_PER_SEC) * Int64(seconds)), dispatch_get_main_queue(), action)
+func after(_ seconds: Double, action: @escaping () -> Void) {
+    DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + Double(Int64(NSEC_PER_SEC) * Int64(seconds)) / Double(NSEC_PER_SEC), execute: action)
 }
 
 class ViewController: UIViewController {
@@ -33,7 +33,7 @@ class ViewController: UIViewController {
         // Dispose of any resources that can be recreated.
     }
     
-    @IBAction func showHud(sender: UIButton) {
+    @IBAction func showHud(_ sender: UIButton) {
         let loader = MaterialLoader.showInView(view)
 //        after(5, action: { () -> Void in
 //            loader.dismiss()

@@ -20,12 +20,12 @@ private let minStroke: CGFloat = 0.05
 private let numberOfArcs: CGFloat = 20
 
 public final class MaterialLoader: UIView {
-    private let loaderLayer = CAShapeLayer()
-    private let containerView = UIView()
+    fileprivate let loaderLayer = CAShapeLayer()
+    fileprivate let containerView = UIView()
     
-    private let timingFunction = CAMediaTimingFunction(name: kCAMediaTimingFunctionEaseInEaseOut)
+    fileprivate let timingFunction = CAMediaTimingFunction(name: kCAMediaTimingFunctionEaseInEaseOut)
     
-    private lazy var indeterminateAnimationGroup: CAAnimationGroup = {
+    fileprivate lazy var indeterminateAnimationGroup: CAAnimationGroup = {
         var animations = [CAAnimation]()
         var startValue: CGFloat = 0
         var startTime: Double = 0
@@ -44,24 +44,24 @@ public final class MaterialLoader: UIView {
         group.animations = animations
         group.duration = startTime
         group.repeatCount = .infinity
-        group.removedOnCompletion = false
+        group.isRemovedOnCompletion = false
         group.fillMode = kCAFillModeForwards
         
         return group
     }()
     
-    private var lineWidth: CGFloat {
+    fileprivate var lineWidth: CGFloat {
         return diameter / 10
     }
     
-    private var progress: CGFloat = 0 {
+    fileprivate var progress: CGFloat = 0 {
         didSet {
             loaderLayer.strokeEnd = 1 / numberOfArcs * progress
             loaderLayer.transform = CATransform3DMakeRotation(progress * 3 * CGFloat(M_PI_2), 0, 0, 1)
         }
     }
     
-    override private init(frame: CGRect) {
+    override fileprivate init(frame: CGRect) {
         super.init(frame: frame)
         
         commonInit()
@@ -73,7 +73,7 @@ public final class MaterialLoader: UIView {
         commonInit()
     }
     
-    private func commonInit() {
+    fileprivate func commonInit() {
         
         let shadowLayer = CALayer()
         shadowLayer.frame = CGRect(
@@ -85,11 +85,11 @@ public final class MaterialLoader: UIView {
         
         shadowLayer.shadowOffset = CGSize(width: 0, height: 2.5)
         shadowLayer.shadowRadius = 3
-        shadowLayer.shadowColor = UIColor(white: 0, alpha: 0.4).CGColor
+        shadowLayer.shadowColor = UIColor(white: 0, alpha: 0.4).cgColor
         shadowLayer.shadowOpacity = 1
         layer.addSublayer(shadowLayer)
         
-        containerView.backgroundColor = .whiteColor()
+        containerView.backgroundColor = .white
         containerView.frame = CGRect(
             x: 0,
             y: 0,
@@ -99,15 +99,15 @@ public final class MaterialLoader: UIView {
         containerView.center = center
         addSubview(containerView)
         
-        let maskPath = UIBezierPath(ovalInRect: containerView.bounds)
-        shadowLayer.shadowPath = maskPath.CGPath
+        let maskPath = UIBezierPath(ovalIn: containerView.bounds)
+        shadowLayer.shadowPath = maskPath.cgPath
 
         let containerMask = CAShapeLayer()
-        containerMask.path = maskPath.CGPath
+        containerMask.path = maskPath.cgPath
         containerView.layer.mask = containerMask
         
         loaderLayer.fillColor = nil
-        loaderLayer.strokeColor = UIColor.redColor().CGColor
+        loaderLayer.strokeColor = UIColor.red.cgColor
         loaderLayer.lineWidth = lineWidth
         loaderLayer.frame = CGRect(
             x: containerView.frame.width / 2 - diameter / 2,
@@ -123,12 +123,12 @@ public final class MaterialLoader: UIView {
         
         let path = UIBezierPath(arcCenter: CGPoint(x: loaderLayer.bounds.midX, y: loaderLayer.bounds.midY), radius: diameter / 2, startAngle: startAngle, endAngle: endAngle, clockwise: true)
         
-        loaderLayer.path = path.CGPath
+        loaderLayer.path = path.cgPath
         loaderLayer.strokeStart = 0
         loaderLayer.strokeEnd = 0.5
     }
     
-    private func startAnimation() {
+    fileprivate func startAnimation() {
         
         let loopDuration: Double = 2
         
@@ -136,15 +136,15 @@ public final class MaterialLoader: UIView {
         rotation.fromValue = 0
         rotation.toValue = 2 * M_PI
         rotation.duration = loopDuration
-        rotation.removedOnCompletion = false
+        rotation.isRemovedOnCompletion = false
         rotation.fillMode = kCAFillModeForwards
         rotation.repeatCount = .infinity
-        containerView.layer.addAnimation(rotation, forKey: "rotation")
+        containerView.layer.add(rotation, forKey: "rotation")
         
-        loaderLayer.addAnimation(indeterminateAnimationGroup, forKey: "group")
+        loaderLayer.add(indeterminateAnimationGroup, forKey: "group")
     }
     
-    private func indeterminateAnimation(startValue: CGFloat, startTime: Double, valueScale: CGFloat) -> [CAAnimation] {
+    fileprivate func indeterminateAnimation(_ startValue: CGFloat, startTime: Double, valueScale: CGFloat) -> [CAAnimation] {
         let startHead = CABasicAnimation(keyPath: "strokeEnd")
         startHead.duration = animationDuration
         startHead.beginTime = startTime
@@ -178,23 +178,23 @@ public final class MaterialLoader: UIView {
     
     // MARK: Public
     
-    public class func showInView(view: UIView, loaderColor: UIColor = .redColor()) -> MaterialLoader {
+    public class func showInView(_ view: UIView, loaderColor: UIColor = .red) -> MaterialLoader {
         let loader = MaterialLoader(frame: view.bounds)
         loader.backgroundColor = UIColor(white: 0, alpha: 0)
         loader.center = view.center
-        loader.loaderLayer.strokeColor = loaderColor.CGColor
+        loader.loaderLayer.strokeColor = loaderColor.cgColor
         view.addSubview(loader)
-        view.bringSubviewToFront(loader)
+        view.bringSubview(toFront: loader)
         
         loader.startAnimation()
         
         return loader
     }
     
-    public class func addRefreshHeader(scrollView: UIScrollView, loaderColor: UIColor = .redColor(), action: () -> Void) {
+    public class func addRefreshHeader(_ scrollView: UIScrollView, loaderColor: UIColor = .red, action: @escaping () -> Void) {
         let loader = MaterialLoader(frame: CGRect(x: 0, y: 0, width: diameter * containerRatio + 20, height: diameter * containerRatio + 20))
-        loader.loaderLayer.strokeColor = loaderColor.CGColor
-        loader.center.x = UIScreen.mainScreen().bounds.size.width / 2
+        loader.loaderLayer.strokeColor = loaderColor.cgColor
+        loader.center.x = UIScreen.main.bounds.size.width / 2
         let pullToRefresh = PullToRefresh(refreshView: loader, animator: loader)
         scrollView.addPullToRefresh(pullToRefresh, action: action)
     }
@@ -205,13 +205,13 @@ public final class MaterialLoader: UIView {
 }
 
 extension MaterialLoader: RefreshViewAnimator {
-    func animateState(state: State) {
+    func animateState(_ state: State) {
         switch state {
-        case .Inital, .Finished:
+        case .inital, .finished:
             loaderLayer.removeAllAnimations()
-        case .Loading:
+        case .loading:
             startAnimation()
-        case .Releasing(let progress):
+        case .releasing(let progress):
             self.progress = progress
         }
     }
@@ -223,21 +223,21 @@ extension MaterialLoader: RefreshViewAnimator {
 // MARK: Pull to refresh stuff
 
 protocol RefreshViewAnimator {
-    func animateState(state: State)
+    func animateState(_ state: State)
 }
 
 public final class PullToRefresh: NSObject {
     
-    var hideDelay: NSTimeInterval = 0
+    var hideDelay: TimeInterval = 0
     
     let refreshView: UIView
-    var action: (() -> ())?
+    var action: (() -> ()) = {}
     
-    private let animator: RefreshViewAnimator
+    fileprivate let animator: RefreshViewAnimator
     
     // MARK: - ScrollView & Observing
     
-    private var scrollViewDefaultInsets = UIEdgeInsetsZero
+    fileprivate var scrollViewDefaultInsets = UIEdgeInsets.zero
     weak var scrollView: UIScrollView? {
         willSet {
             removeScrollViewObserving()
@@ -250,43 +250,43 @@ public final class PullToRefresh: NSObject {
         }
     }
     
-    private func addScrollViewObserving() {
-        scrollView?.addObserver(self, forKeyPath: contentOffsetKeyPath, options: .Initial, context: &KVOContext)
+    fileprivate func addScrollViewObserving() {
+        scrollView?.addObserver(self, forKeyPath: contentOffsetKeyPath, options: .initial, context: &KVOContext)
     }
     
-    private func removeScrollViewObserving() {
+    fileprivate func removeScrollViewObserving() {
         scrollView?.removeObserver(self, forKeyPath: contentOffsetKeyPath, context: &KVOContext)
     }
     
     // MARK: - State
     
-    var state: State = .Inital {
+    var state: State = .inital {
         didSet {
             animator.animateState(state)
             switch state {
-            case .Loading:
-                if let scrollView = scrollView where (oldValue != .Loading) {
+            case .loading:
+                if let scrollView = scrollView , (oldValue != .loading) {
                     scrollView.contentOffset = previousScrollViewOffset
                     scrollView.bounces = false
-                    UIView.animateWithDuration(0.3, animations: {
+                    UIView.animate(withDuration: 0.3, animations: {
                         let insets = self.refreshView.frame.height + self.scrollViewDefaultInsets.top
                         scrollView.contentInset.top = insets
                         
-                        scrollView.contentOffset = CGPointMake(scrollView.contentOffset.x, -insets)
+                        scrollView.contentOffset = CGPoint(x: scrollView.contentOffset.x, y: -insets)
                         }, completion: { finished in
                             scrollView.bounces = true
                     })
                     
-                    action?()
+                    action()
                 }
-            case .Finished:
+            case .finished:
                 removeScrollViewObserving()
-                UIView.animateWithDuration(1, delay: hideDelay, usingSpringWithDamping: 0.4, initialSpringVelocity: 0.8, options: UIViewAnimationOptions.CurveLinear, animations: {
+                UIView.animate(withDuration: 1, delay: hideDelay, usingSpringWithDamping: 0.4, initialSpringVelocity: 0.8, options: UIViewAnimationOptions.curveLinear, animations: {
                     self.scrollView?.contentInset = self.scrollViewDefaultInsets
                     self.scrollView?.contentOffset.y = -self.scrollViewDefaultInsets.top
                     }, completion: { finished in
                         self.addScrollViewObserving()
-                        self.state = .Inital
+                        self.state = .inital
                 })
             default: break
             }
@@ -306,29 +306,29 @@ public final class PullToRefresh: NSObject {
     
     // MARK: KVO
     
-    private var KVOContext = "PullToRefreshKVOContext"
-    private let contentOffsetKeyPath = "contentOffset"
-    private var previousScrollViewOffset: CGPoint = CGPointZero
+    fileprivate var KVOContext = "PullToRefreshKVOContext"
+    fileprivate let contentOffsetKeyPath = "contentOffset"
+    fileprivate var previousScrollViewOffset: CGPoint = CGPoint.zero
     
-    override  public func observeValueForKeyPath(keyPath: String?, ofObject object: AnyObject?, change: [String : AnyObject]?, context: UnsafeMutablePointer<()>) {
+    public override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
         if (context == &KVOContext && keyPath == contentOffsetKeyPath && object as? UIScrollView == scrollView) {
             let offset = previousScrollViewOffset.y + scrollViewDefaultInsets.top
             let refreshViewHeight = refreshView.frame.height
             
             switch offset {
-            case 0 where (state != .Loading): state = .Inital
-            case -refreshViewHeight...0 where (state != .Loading && state != .Finished):
-                state = .Releasing(progress: -offset / refreshViewHeight)
+            case 0 where (state != .loading): state = .inital
+            case -refreshViewHeight...0 where (state != .loading && state != .finished):
+                state = .releasing(progress: -offset / refreshViewHeight)
             case -1000...(-refreshViewHeight):
-                if state == State.Releasing(progress: 1) && scrollView?.dragging == false {
-                    state = .Loading
-                } else if state != State.Loading && state != State.Finished {
-                    state = .Releasing(progress: 1)
+                if state == State.releasing(progress: 1) && scrollView?.isDragging == false {
+                    state = .loading
+                } else if state != State.loading && state != State.finished {
+                    state = .releasing(progress: 1)
                 }
             default: break
             }
         } else {
-            super.observeValueForKeyPath(keyPath, ofObject: object, change: change, context: context)
+            super.observeValue(forKeyPath: keyPath, of: object, change: change, context: context)
         }
         
         previousScrollViewOffset.y = scrollView!.contentOffset.y
@@ -337,22 +337,21 @@ public final class PullToRefresh: NSObject {
     // MARK: - Start/End Refreshing
     
     func startRefreshing() {
-        if self.state != State.Inital {
+        if self.state != State.inital {
             return
         }
         
-        scrollView?.setContentOffset(CGPointMake(0, -refreshView.frame.height - scrollViewDefaultInsets.top), animated: true)
-        let delayTime = dispatch_time(DISPATCH_TIME_NOW,
-            Int64(0.27 * Double(NSEC_PER_SEC)))
+        scrollView?.setContentOffset(CGPoint(x: 0, y: -refreshView.frame.height - scrollViewDefaultInsets.top), animated: true)
+        let delayTime = DispatchTime.now() + Double(Int64(0.27 * Double(NSEC_PER_SEC))) / Double(NSEC_PER_SEC)
         
-        dispatch_after(delayTime, dispatch_get_main_queue(), {
-            self.state = State.Loading
+        DispatchQueue.main.asyncAfter(deadline: delayTime, execute: {
+            self.state = State.loading
         })
     }
     
     func endRefreshing() {
-        if state == .Loading {
-            state = .Finished
+        if state == .loading {
+            state = .finished
         }
     }
 }
@@ -360,25 +359,25 @@ public final class PullToRefresh: NSObject {
 // MARK: - State enumeration
 
 enum State:Equatable, CustomStringConvertible {
-    case Inital, Loading, Finished
-    case Releasing(progress: CGFloat)
+    case inital, loading, finished
+    case releasing(progress: CGFloat)
     
     var description: String {
         switch self {
-        case .Inital: return "Inital"
-        case .Releasing(let progress): return "Releasing:\(progress)"
-        case .Loading: return "Loading"
-        case .Finished: return "Finished"
+        case .inital: return "Inital"
+        case .releasing(let progress): return "Releasing:\(progress)"
+        case .loading: return "Loading"
+        case .finished: return "Finished"
         }
     }
 }
 
 func ==(a: State, b: State) -> Bool {
     switch (a, b) {
-    case (.Inital, .Inital): return true
-    case (.Loading, .Loading): return true
-    case (.Finished, .Finished): return true
-    case (.Releasing, .Releasing): return true
+    case (.inital, .inital): return true
+    case (.loading, .loading): return true
+    case (.finished, .finished): return true
+    case (.releasing, .releasing): return true
     default: return false
     }
 }
@@ -387,7 +386,7 @@ func ==(a: State, b: State) -> Bool {
 private var associatedObjectHandle: UInt8 = 0
 
 extension UIScrollView {
-    private(set) var pullToRefresh: PullToRefresh? {
+    fileprivate(set) var pullToRefresh: PullToRefresh? {
         get {
             return objc_getAssociatedObject(self, &associatedObjectHandle) as? PullToRefresh
         }
@@ -396,7 +395,7 @@ extension UIScrollView {
         }
     }
     
-    public func addPullToRefresh(pullToRefresh: PullToRefresh, action:()->()) {
+    public func addPullToRefresh(_ pullToRefresh: PullToRefresh, action:@escaping ()->()) {
         if let pull = self.pullToRefresh {
             removePullToRefresh(pull)
         }
@@ -408,10 +407,10 @@ extension UIScrollView {
         let view = pullToRefresh.refreshView
         view.frame.origin.y = -view.frame.height
         self.addSubview(view)
-        self.sendSubviewToBack(view)
+        self.sendSubview(toBack: view)
     }
     
-    public func removePullToRefresh(pullToRefresh: PullToRefresh) {
+    public func removePullToRefresh(_ pullToRefresh: PullToRefresh) {
         self.pullToRefresh?.refreshView.removeFromSuperview()
         self.pullToRefresh = nil
     }

@@ -23,7 +23,7 @@ public final class MaterialLoader: UIView {
     fileprivate let loaderLayer = CAShapeLayer()
     fileprivate let containerView = UIView()
     
-    fileprivate let timingFunction = CAMediaTimingFunction(name: kCAMediaTimingFunctionEaseInEaseOut)
+    fileprivate let timingFunction = CAMediaTimingFunction(name: CAMediaTimingFunctionName.easeInEaseOut)
     
     fileprivate lazy var indeterminateAnimationGroup: CAAnimationGroup = {
         var animations = [CAAnimation]()
@@ -45,7 +45,7 @@ public final class MaterialLoader: UIView {
         group.duration = startTime
         group.repeatCount = .infinity
         group.isRemovedOnCompletion = false
-        group.fillMode = kCAFillModeForwards
+        group.fillMode = CAMediaTimingFillMode.forwards
         
         return group
     }()
@@ -57,7 +57,7 @@ public final class MaterialLoader: UIView {
     fileprivate var progress: CGFloat = 0 {
         didSet {
             loaderLayer.strokeEnd = 1 / numberOfArcs * progress
-            loaderLayer.transform = CATransform3DMakeRotation(progress * 3 * CGFloat(M_PI_2), 0, 0, 1)
+            loaderLayer.transform = CATransform3DMakeRotation(progress * 3 * CGFloat(Double.pi / 2), 0, 0, 1)
         }
     }
     
@@ -119,7 +119,7 @@ public final class MaterialLoader: UIView {
         containerView.layer.addSublayer(loaderLayer)
         
         let startAngle: CGFloat = 0
-        let endAngle = CGFloat(numberOfArcs) * 6 + 1.5 * CGFloat(M_PI)
+        let endAngle = CGFloat(numberOfArcs) * 6 + 1.5 * CGFloat(Double.pi)
         
         let path = UIBezierPath(arcCenter: CGPoint(x: loaderLayer.bounds.midX, y: loaderLayer.bounds.midY), radius: diameter / 2, startAngle: startAngle, endAngle: endAngle, clockwise: true)
         
@@ -134,10 +134,10 @@ public final class MaterialLoader: UIView {
         
         let rotation = CABasicAnimation(keyPath: "transform.rotation")
         rotation.fromValue = 0
-        rotation.toValue = 2 * M_PI
+        rotation.toValue = 2 * Double.pi
         rotation.duration = loopDuration
         rotation.isRemovedOnCompletion = false
-        rotation.fillMode = kCAFillModeForwards
+        rotation.fillMode = CAMediaTimingFillMode.forwards
         rotation.repeatCount = .infinity
         containerView.layer.add(rotation, forKey: "rotation")
         
@@ -184,7 +184,7 @@ public final class MaterialLoader: UIView {
         loader.center = view.center
         loader.loaderLayer.strokeColor = loaderColor.cgColor
         view.addSubview(loader)
-        view.bringSubview(toFront: loader)
+        view.bringSubviewToFront(loader)
         
         loader.startAnimation()
         
@@ -281,7 +281,7 @@ public final class PullToRefresh: NSObject {
                 }
             case .finished:
                 removeScrollViewObserving()
-                UIView.animate(withDuration: 1, delay: hideDelay, usingSpringWithDamping: 0.4, initialSpringVelocity: 0.8, options: UIViewAnimationOptions.curveLinear, animations: {
+                UIView.animate(withDuration: 1, delay: hideDelay, usingSpringWithDamping: 0.4, initialSpringVelocity: 0.8, options: UIView.AnimationOptions.curveLinear, animations: {
                     self.scrollView?.contentInset = self.scrollViewDefaultInsets
                     self.scrollView?.contentOffset.y = -self.scrollViewDefaultInsets.top
                     }, completion: { finished in
@@ -407,7 +407,7 @@ extension UIScrollView {
         let view = pullToRefresh.refreshView
         view.frame.origin.y = -view.frame.height
         self.addSubview(view)
-        self.sendSubview(toBack: view)
+        self.sendSubviewToBack(view)
     }
     
     public func removePullToRefresh(_ pullToRefresh: PullToRefresh) {
